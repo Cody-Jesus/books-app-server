@@ -16,9 +16,9 @@ client.on('error', console.error)
 app.use(cors())
 
 app.get('/api/v1/books', (req, res) => {
-  client.query('SELECT book_id, title, author, image_url, description, isbn FROM books;')
-  .then(results => res.send(results.rows))
-  .catch(console.error)
+  client.query('SELECT * FROM books;')
+    .then(results => res.send(results.rows))
+    .catch(console.error)
 })
 
 app.all('*', (req, res) => res.redirect(CLIENT_URL))

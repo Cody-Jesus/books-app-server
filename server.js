@@ -21,5 +21,13 @@ app.get('/api/v1/books', (req, res) => {
     .catch(console.error)
 })
 
+app.get('/api/v1/books/:id', (req, res) => {
+  client.query(`SELECT * FROM books WHERE book_id=$1;`, [req.params.id])
+  // console.log('your getting books by id')
+    // .then(console.log(res))
+    .then(result => res.send(result.rows))
+    .catch(console.error);
+});
+
 app.all('*', (req, res) => res.redirect(CLIENT_URL))
 app.listen(PORT, () => console.log(`Listening on ${PORT}`))

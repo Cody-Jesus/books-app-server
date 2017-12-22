@@ -5,6 +5,7 @@ const cors = require('cors');
 const pg = require('pg');
 const bodyParser = require('body-parser').urlencoded({extended: true});
 
+
 const app = express();
 const PORT = process.env.PORT;
 const CLIENT_URL = process.env.CLIENT_URL;
@@ -14,6 +15,8 @@ client.connect();
 client.on('error', err => console.error(err));
 
 app.use(cors());
+
+bodyParser.urlencoded( {extended: false} )
 
 app.get('/api/v1/books', (req, res) => {
   client.query('select book_id, title, author, image_url from books;')
@@ -37,3 +40,4 @@ app.post('/api/v1/books', bodyParser, (req, res) => {
 
 app.get('*', (req, res) => res.redirect(CLIENT_URL));
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
+

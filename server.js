@@ -3,58 +3,41 @@
 const express = require('express');
 const cors = require('cors');
 const pg = require('pg');
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser').urlencoded({extended: true});
 
-const app = express()
-const PORT = process.env.PORT
-const DATABASE_URL = process.env.DATABASE_URL
-const CLIENT_URL = process.env.CLIENT_URL
 
-const client = new pg.Client(DATABASE_URL)
-client.connect()
-client.on('error', console.error)
+const app = express();
+const PORT = process.env.PORT;
+const CLIENT_URL = process.env.CLIENT_URL;
 
-app.use(cors())
+const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('error', err => console.error(err));
+
+app.use(cors());
 
 bodyParser.urlencoded( {extended: false} )
 
 app.get('/api/v1/books', (req, res) => {
-  client.query('SELECT * FROM books;')
-    .then(results => res.send(results.rows))
-    .catch(console.error)
-})
+  client.query('select book_id, title, author, image_url from books;')
+  .then(results => res.send(results.rows))
+  .catch(console.error);
+});
 
 app.get('/api/v1/books/:id', (req, res) => {
-  client.query(`SELECT * FROM books WHERE book_id=$1;`, [req.params.id])
-    .then(result => res.send(result.rows))
-    .catch(console.error);
+  client.query('select * from books where book_id=$1', [req.params.id])
+  .then(results => res.send(results.rows))
+  .catch(console.log);
 });
 
-app.post('/api/v1/books', (request, response) => {
-  // COMMENT: What number(s) of the full-stack-diagram.png image correspond to the following line of code? Which method of article.js is interacting with this particular piece of `server.js`? What part of CRUD is being enacted/managed by this particular piece of code?
-  // PUT YOUR RESPONSE HERE
+app.post('/api/v1/books', bodyParser, (req, res) => {
   client.query(
-    `INSERT INTO
-    books (title, author, image_url, isbn, description)
-    VALUES ($1, $2, $3, $4, $5);
-    `,
-    [
-      request.body.title,
-      request.body.author,
-      request.body.image_url,
-      request.body.isbn,
-      request.body.description
-    ]
+    'insert into books(title, author, isbn, image_url, description) values($1, $2, $3, $4, $5)',
+    [req.body.title, req.body.author, req.body.isbn, req.body.image_url, req.body.description]
   )
-    .then(function() {
-      response.send('insert complete')
-    })
-    .catch(function(err) {
-      console.error(err);
-    });
+  .then(result => res.send('insertion complete'));
 });
 
+app.get('*', (req, res) => res.redirect(CLIENT_URL));
+app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
 
-
-app.all('*', (req, res) => res.redirect(CLIENT_URL))
-app.listen(PORT, () => console.log(`Listening on ${PORT}`))

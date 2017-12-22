@@ -20,14 +20,14 @@ bodyParser.urlencoded( {extended: false} )
 
 app.get('/api/v1/books', (req, res) => {
   client.query('select book_id, title, author, image_url from books;')
-  .then(results => res.send(results.rows))
-  .catch(console.error);
+    .then(results => res.send(results.rows))
+    .catch(console.error);
 });
 
 app.get('/api/v1/books/:id', (req, res) => {
   client.query('select * from books where book_id=$1', [req.params.id])
-  .then(results => res.send(results.rows))
-  .catch(console.log);
+    .then(results => res.send(results.rows))
+    .catch(console.log);
 });
 
 app.post('/api/v1/books', bodyParser, (req, res) => {
@@ -40,4 +40,3 @@ app.post('/api/v1/books', bodyParser, (req, res) => {
 
 app.get('*', (req, res) => res.redirect(CLIENT_URL));
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
-

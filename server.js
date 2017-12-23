@@ -36,5 +36,11 @@ app.post('/api/v1/books', bodyParser, (req, res) => {
     .then(() => res.send('insertion complete'));
 });
 
+app.delete('/api/v1/books/:id', (req, res) => {
+  client.query(`DELETE FROM books WHERE book_id=$1`, [req.params.id])
+    .then(() => res.sendStatus(204))
+    .catch(console.error);
+});
+
 app.get('*', (req, res) => res.redirect(CLIENT_URL));
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
